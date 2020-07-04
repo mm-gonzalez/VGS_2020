@@ -1,0 +1,187 @@
+"""
+Check list
+
+MAY
+Started on 05/18/2020
+Made Someone class and stat methods 05/18
+Created Skill library and methods 05/20
+fix _search_skills() on Skill_library.py 05/27
+_assign_skill now reads the abilites    05/27
+determine_skills uses skill data to make physical/Magic/Support Skills  05/27
+created display_skill and display_targets to make show the skills are availlible 05/29
+"Hero HP can go above their limit" fixed 05/31
+"user can select numbers greater than the index" fixed 05/31
+Input can now exit with 123 as input 05/31
+Foe HP will depleate using skills or basic attacks 05/31
+Got rid of critical attack chance in Attack Melee 05/31
+JUNE
+Took a break from 05/31 - 06/06
+basic "AI" for enemy was created 06/07
+Nerfed some of the base damage for current list of skills 06/07
+Added basic someones and skills for varity 06/07
+_adjust(damge) will now prevent Someone from gaining health from an attack 06/09
+PvP has been added 06/09
+You can create a team of party members to fight a group of enemies (keeps track of turns) 06/10
+Magic and Speed stat were created along with other methods for Someone Class 06/11
+Magic attacks will now add the players Magic stat to deal more damage 06/11
+Turn order will now be determined by the speed of all players 06/11
+smart_heal will return a list of people that actually need healing 06/14
+AI and players_turn use smart heal to prevent turn loss in team battle 06/15
+Smaller bugs were in team battle (turn loss prevention) 06/16/15 
+only living targets can targeted for healing and attacks with smart choice 06/15
+cereated viz folder and started working on health bar visual 06/22
+NEXT MISSION
+############
+
+created a folder for all the read textfiles can go to
+Visuals file
+rename skill_library.py to just skill
+create Somone_library.txt along with read file code and update stats upon LV up
+create skill_library.txt that is meant to read of skill data
+reveiw red dots and delete anything that is no longer need
+delint
+
+
+thinking about dividing the skill class into 4 other classes and revamping
+determine skill because it's big and nasty
+this decision should be made before creating a "read skill library" function
+
+magic can contain the elmental affinity in order to create weakness/resists
+support should not require a hit rate and specify what it's curing (HP, death, status)
+tatics won't need a hit roll if it is a buff/debuff but will on status aliments
+physical is a netraul affinity and can casue status effects as well
+     class Magic(self, name, cost, affinity, status)
+     class Support(self, name, cost, effect)
+     class tatics(self, name, cost, buff=True, status=False)
+     class Physical(self, name, cost, status)
+
+since evrything works the it does, try to create visuals first
+############
+
+
+VegaBonds exclusive
+*****************************
+Shield points
+-------------
+These are tempory hit points that will deplete first before the users HP goes down
+Shocking spells will cause Shield points to deplete faster but are not effective on normal HP
+
+Leader system
+-------------
+If Someone is the leader, magic attacks/support gain the AOE effect
+While they are leader, they cannont use physical attacks unless the skill allows it
+Leaders cannot be targeted by physical attacks unless the skill allows it
+
+Someone can move into the frontline to declare someone else as a new leader as their action.
+Someone can move into the backline to declare themself as leader as their action. 
+
+Maybe have each indivdual character have a rank/level based on the expereience as a leader
+if they are good enough, they can earn perks seperatly
+
+Lv0 Player can check the next person in line while leader can see the entire turn order (this does not use action)
+Lv1 Leader can switch into frontline without wasting their action
+Lv2 Leader can use 1 item without wasting their action (The 2nd item will spend their turn)
+Lv3 Player can switch into backline without wasting their action
+Lv4 Leader/Player can switch while allowing the switched person to take their turn instead (turn order stays the same)
+
+The 5th leader perk should be an action that is specific to each character
+
+Paige - Group Gaurd
+Leader can command the whole party to gaurd as the leaders action
+(This is more effective if she is last, everyone will be able to attack then defend)
+
+Mobius - Aquarius
+This an AOE that first deals medium electric damage and then intense water damage
+ 
+Emma - Reconcile
+
+Heals allies includeing Emma. 
+If the amount of helaing exceeds their Max health, will begin replenishing shield points
+
+Flint - Metor Shower
+Physical but needs magic in order to cast it
+Attacks all eniemes up to 3 times, one of those attacks will have a higher chance to crit
+all enimes will have an Attack debuff after
+
+*****************************
+"""
+
+06/22
+After some thining I've decided that the combat class at the moment is going to
+cauase confusion. I can feel myself lost while spawning new ideas that makes things less clear.
+I should work on this a later time when my code is more clean
+this means that the following task will not be completed later
+
+create Revive skill (smart_choice with reverse=True should help)
+create buff/debuff skills
+create gaurd skill (gamestate?)
+
+
+This is what I created so far but most likely will have so revamp completely after
+
+To my future self: It's okay if you don't need to use this code if what you fixed up
+is way better
+
+class combat:
+    """
+    This is to add more features into battle
+    that someone class cannot act alone
+    """
+    def __init__(self, person, leader=False, party, foes):
+        self._user = person
+        self._party = party
+        self._foes = foes
+        self._leader = leader
+        self._buffs = [0,0,0] #1st is Attack 2nd is Def and 3rd is speed
+        self._status = "None"
+        self._repel = False
+        self._guard = False
+    def get_leader(self):
+        """
+        this is to show that someon is the leader
+        not much us until visuals
+        """
+        if self._leader:
+            return self._user.get_name() + " is the leader"
+        else:
+            return self._user.get_name() + " is not the leader"
+    def get_status(self):
+        """
+        shows what ailment is effecting the current player
+        """
+        return str(self._status)
+    def switch_leader(self, other):
+        """
+        This lets a person in command switch positions
+        """
+        self._leader,other._leader = other._leader, self._leader
+    def Is_Leader(self):
+        return self._leader
+    def Leader_AOE(self):
+        if Is_Leader():
+            AOE_effect = str(input("Use this effect on everyone [y/n]"))
+            if AOE_effect == 'y' or AOE_effect == 'Y':
+                
+    def defend(self):
+        """
+        while this is true then the player will
+        have boost to their defensse by 20%
+        """
+        og_def = self._user.get_DEF()
+        self._guard = True
+        if self._guard:
+            self._user._DEF = add_percent(og_def, 20)
+        elif self._gaurd == False:
+            self._user._DEF = og_def
+    def buff_change(self, turn, expire, change, postive=True):
+        """
+        change is a list [0,0,0]
+        based on the coordinates, it adds onto the buff
+        this way, it can match with buff and make the right changes
+        targets is the list of targets
+        if positive is False then it will be a debuff
+        """
+        if self._leader and someone not in foes:
+            AOE_effect = str(input("use this effect on everyone? [y/n]"))
+            if AOE_effect == 'y' or AOE_effect == 'Y':
+                for i in range(len(party)):
